@@ -1,11 +1,9 @@
-// TicketForm.jsx
 import "./App.css";
 import { useState, useEffect } from "react";
-import {  } from "react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
-// import { useForm } from "react-hook-form";
+
 function TicketForm() {
-  //   const { handleSubmit: onSubmit } = useForm();
+  // State variables to store form input values
   const [userId, setUserId] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [location, setLocation] = useState("");
@@ -13,8 +11,8 @@ function TicketForm() {
   const [comment, setComment] = useState("");
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleString());
 
-// Update time every second
-useEffect(() => {
+  // Update time every second
+  useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date().toLocaleString());
     }, 1000);
@@ -22,7 +20,7 @@ useEffect(() => {
     return () => clearInterval(timer);
   }, []);
 
-
+  // Function to reset form fields
   const handleReset = () => {
     setUserId("");
     setMobileNumber("");
@@ -36,24 +34,34 @@ useEffect(() => {
     }
   };
 
-     // Updated handleSubmit to include timestamp
-  const handleSubmit = (e) => {
+  // Function to handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const submissionData = {
-      timestamp: currentTime,  // Include the timestamp
+      timestamp: currentTime, // Include the timestamp
       userId,
       mobileNumber,
       location,
       issueType,
       comment,
     };
-    
+
     console.log("Ticket submitted:", submissionData);
-    // You can send submissionData to your backend here
+
+    // Send submissionData to the backend
+    const response = await fetch('http://localhost:3000/api/tickets/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(submissionData)
+    });
+
+    const data = await response.json();
+    console.log(data);
   };
 
-
-   // Update time every second
+  // Function to get the current timestamp
   const getCurrentTimestamp = () => {
     return new Date().toLocaleString();
   };
@@ -63,12 +71,13 @@ useEffect(() => {
       <div className="bg-white rounded-lg shadow-md p-4 md:p-6 lg:p-12 xl:p-12">
         <h2 className="text-lg text-black font-bold mb-4">Report an Issue</h2>
 
-        {/* Add Timestamp Display */}
+        {/* Display current timestamp */}
         <div className="mb-4">
           <p className="text-sm text-gray-600">
             Ticket Time: {getCurrentTimestamp()}
           </p>
         </div>
+
         <form onSubmit={handleSubmit}>
           {/* User ID */}
           <div className="mb-4">
@@ -206,27 +215,12 @@ useEffect(() => {
             <textarea
               id="comment"
               value={comment}
+              placeholder="Enter your comments"
               onChange={(e) => setComment(e.target.value)}
               className="shadow appearance-none border rounded w-full py-2 px-3 text-black bg-white leading-tight focus:outline-none focus:shadow-outline"
             />
           </div>
 
-          {/* Submit & Reset Buttons */}
-          {/* <div className="flex gap-4">
-            <button
-              type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
-              Submit
-            </button>
-            <button
-              type="button"
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-              onClick={handleReset}
-            >
-              Reset
-            </button>
-          </div> */}
           {/* Submit & Reset Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 w-full">
             <button
@@ -243,7 +237,6 @@ useEffect(() => {
               Reset
             </button>
           </div>
-          
         </form>
       </div>
     </div>
